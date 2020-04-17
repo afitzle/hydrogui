@@ -12,7 +12,7 @@ MainWindow::MainWindow(wxWindow *parent,
     wxMenuBar *menuBar = new wxMenuBar;
 			wxMenu *menuFile = new wxMenu;
 	    menuFile->Append(1, "&Help...\tCtrl-H",
-                     "Help string shown in status bar for this menu item");
+                     "Redirects to hydrogui git repository");
 				menuFile->AppendSeparator();	
     menuBar->Append(menuFile, "About");
     SetMenuBar( menuBar );
@@ -40,7 +40,7 @@ void MainWindow::OnExit(wxCommandEvent& event) {
 
 void MainWindow::OnAbout(wxCommandEvent& event)
 {
-    static wxString s_url(wxT("https://github.com/iowastateuniversity-programanalysis/hydrogen"));
+    static wxString s_url(wxT("https://github.com/afitzle/hydrogui"));
     if ( !wxLaunchDefaultBrowser(s_url) )
     {
         wxLogError(wxT("Failed to open URL \"%s\""), s_url.c_str());
