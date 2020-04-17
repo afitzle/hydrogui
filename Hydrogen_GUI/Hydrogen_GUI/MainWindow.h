@@ -15,7 +15,7 @@ public:
 		long style = wxDEFAULT_FRAME_STYLE,
 		const wxString& name = wxFrameNameStr);
 	void OnExit(wxCommandEvent& event);
-
+	void OnAbout(wxCommandEvent& event);
 	~MainWindow();
 };
 
