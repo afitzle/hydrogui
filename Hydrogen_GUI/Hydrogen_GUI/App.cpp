@@ -16,6 +16,7 @@ bool App::OnInit()
 		window::id::MAINWINDOW,
 		_("Main Window"));
 	main->Show();
+	SetTopWindow(main);
 	return true;
 }
 

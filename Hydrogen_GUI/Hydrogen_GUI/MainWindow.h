@@ -14,6 +14,8 @@ public:
 		const wxSize& size = wxDefaultSize,
 		long style = wxDEFAULT_FRAME_STYLE,
 		const wxString& name = wxFrameNameStr);
+	void OnExit(wxCommandEvent& event);
+
 	~MainWindow();
 };
 
