@@ -1,6 +1,7 @@
 #include "App.h"
 #include "id.h"
 #include "MainWindow.h"
+#include<wx/textctrl.h>
 IMPLEMENT_APP(App); //main
 
 App::App()

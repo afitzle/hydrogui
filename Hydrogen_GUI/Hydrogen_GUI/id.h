@@ -1,4 +1,5 @@
 #pragma once
+#include <wx/defs.h>
 namespace window
 {
 	enum id

@@ -1,5 +1,5 @@
 #include "MainWindow.h"
-
+#include <iostream>
 
 
 MainWindow::MainWindow(wxWindow *parent,
@@ -11,6 +11,10 @@ MainWindow::MainWindow(wxWindow *parent,
 	const wxString& name) :
 	wxFrame(parent, id, title, pos, size, style, name)
 {
+  	wxPanel *frame = new wxPanel(this);
+	frame->Show();
+        wxTextCtrl *text = new wxTextCtrl(frame, wxID_ANY, "", wxPoint(10,10), wxSize(140, 30), 0,
+					  wxDefaultValidator, wxTextCtrlNameStr);
 }
 
 
