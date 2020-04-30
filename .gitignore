@@ -4,3 +4,5 @@
 Debug/
 Release/
 .vs/
+.vscode/c_cpp_properties.json
+.vscode/settings.json

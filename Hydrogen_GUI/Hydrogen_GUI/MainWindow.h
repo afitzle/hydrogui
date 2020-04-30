@@ -17,6 +17,8 @@ public:
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void SelectMVICFG(wxCommandEvent& WXUNUSED(event));
+	void OnExec(wxCommandEvent& event);
+	wxArrayString doExecute(wxString& cmd);
 	~MainWindow();
 };
 
