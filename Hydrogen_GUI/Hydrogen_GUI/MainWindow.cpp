@@ -23,6 +23,8 @@ MainWindow::MainWindow(wxWindow *parent,
 	 			
     wxTextCtrl *text = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(10,10), wxSize(140, 30), 0,
 					  wxDefaultValidator, wxTextCtrlNameStr);
+    wxButton* graphBtn = new wxButton(panel, 4, "Select MVICFG", wxPoint(10,50),wxSize(125, 50));
+    Bind(wxEVT_BUTTON, &MainWindow::SelectMVICFG, this, 4);
 	wxButton* btn = new wxButton(panel, wxID_ANY, "Button", wxPoint(250,100),wxSize(100, 50));
 	
 	Bind(wxEVT_MENU, &MainWindow::OnAbout, this, 1);
@@ -45,4 +47,20 @@ void MainWindow::OnAbout(wxCommandEvent& event)
     {
         wxLogError(wxT("Failed to open URL \"%s\""), s_url.c_str());
     }
+}
+
+void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
+{
+	wxFileDialog* OpenDialog = new wxFileDialog(
+		this, ("Select an MVICFG to view"), wxEmptyString, wxEmptyString, "Dot Files (*.dot)|*.dot"
+		, wxFD_OPEN, wxDefaultPosition);
+	if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+		wxString CurrentDocPath = OpenDialog->GetPath();
+		// Sets our current document to the file the user selected
+		system("xdot " + CurrentDocPath);
+	}
+
+	// Clean up after ourselves
+	OpenDialog->Destroy();
 }

@@ -16,6 +16,7 @@ public:
 		const wxString& name = wxFrameNameStr);
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
+	void SelectMVICFG(wxCommandEvent& WXUNUSED(event));
 	~MainWindow();
 };
 
