@@ -14,7 +14,7 @@ MainWindow::MainWindow(wxWindow *parent,
 			wxMenu *menuConsole = new wxMenu;
 	    menuFile->Append(1, "&Help...\tCtrl-H",
                      "Redirects to hydrogui git repository");
-		menuConsole->Append(2, "&Console..\tCtrl-H",
+		menuConsole->Append(2, "&Install Hydrogen in Docker..\tCtrl-H",
                      "Redirects to hydrogui git repository");			 
     menuBar->Append(menuFile, "About");
 	menuBar->Append(menuConsole, "Console");
@@ -55,12 +55,12 @@ void MainWindow::OnExit(wxCommandEvent& event) {
  */
 void MainWindow::OnExec(wxCommandEvent& event)
 {
-	wxString test = "ps -a";
+	wxString test = "sudo docker exec Hydrogen_Env git clone https://github.com/iowastateuniversity-programanalysis/hydrogen.git /home/Hydrogen/MVICFG"; 
 	wxArrayString out = doExecute(test);
 }
 /**
  * doExecute
- * 	Executes a command and returns the output generated
+ * 	Executes a command and returns the output generate
  *	by the program being executed.
  * @param  {wxString} cmd   : command to be executed
  * @return {wxArrayString} output  : Array 
@@ -74,7 +74,9 @@ wxArrayString MainWindow::doExecute(wxString& cmd)
 	size_t count = output.GetCount();
 	//no output
 	if (!count) return output;
-
+	
+	std::cout << cmd.c_str() + "\n";
+	std::cout << "whatever\n";
 	//prints output (debugging purposes)		
 	for ( size_t n = 0; n < count; n++ )
     {
