@@ -19,6 +19,7 @@ public:
 	void SelectMVICFG(wxCommandEvent& WXUNUSED(event));
 	void OnExec(wxCommandEvent& event);
 	wxArrayString doExecute(wxString& cmd);
+	void selectSource(wxCommandEvent& event);
 	~MainWindow();
 };
 

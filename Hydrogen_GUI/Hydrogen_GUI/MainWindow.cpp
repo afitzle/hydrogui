@@ -30,6 +30,8 @@ MainWindow::MainWindow(wxWindow *parent,
 
     wxButton* graphBtn = new wxButton(panel, 4, "Select MVICFG", wxPoint(10,50),wxSize(125, 50));
     Bind(wxEVT_BUTTON, &MainWindow::SelectMVICFG, this, 4);
+    wxButton* sourceBtn = new wxButton(panel, 5, "Select Source Files", wxPoint(140,50),wxSize(125, 50));
+    Bind(wxEVT_BUTTON, &MainWindow::selectSource, this, 5);
 	wxButton* btn = new wxButton(panel, wxID_ANY, "Button", wxPoint(250,100),wxSize(100, 50));
 	
 	Bind(wxEVT_MENU, &MainWindow::OnAbout, this, 1);
@@ -100,6 +102,24 @@ void MainWindow::OnAbout(wxCommandEvent& event)
     {
         wxLogError(wxT("Failed to open URL \"%s\""), s_url.c_str());
     }
+}
+
+void selectSource(wxCommandEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(this, ("Select an MVICFG to view"), wxEmptyString, wxEmptyString,
+						"C Files (*.c)|*.c", wxFD_MULTIPLE, wxDefaultPosition);
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+    {
+      wxArrayString CurrentDocPaths;
+      OpenDialog->GetPaths(CurrentDocPaths);
+      std::cout << CurrentDocPaths.GetCount();
+            // Sets our current document to the file the user selected
+            //system("xdot " + CurrentDocPath);
+    }
+
+    // Clean up after ourselves
+    OpenDialog->Destroy();
+    
 }
 
 void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
