@@ -46,6 +46,43 @@ void MainWindow::OnExit(wxCommandEvent& event) {
 }
 
 
+void MainWindow::generateGraph()
+{
+	//buildninja dir /home/Hydrogen/MVICFG/BuildNinja
+
+	//cd TestPrograms/Buggy
+	wxString prog1;
+	wxString prog2;
+	wxString pathToHydro="/home/Hydrogen/MVICFG/BuildNinja/Hydrogen.out ";
+	wxString execScript="sudo docker exec Hydrogen_Env chmod 777 /home/Hydrogen/MVICFG/hydro-clang.sh";
+	wxString pathToScript="sudo docker exec Hydrogen_Env bash ./home/Hydrogen/MVICFG/hydro-clang.sh";
+	wxString pathToProg1=" /home/Hydrogen/MVICFG/TestPrograms/Buggy/";
+	wxString pathToProg2=" /home/Hydrogen/MVICFG/TestPrograms/Correct/";
+	wxString dropScript = "docker cp hydro-clang.sh Hydrogen_Env:/home/Hydrogen/MVICFG/hydro-clang.sh";
+	wxString pickupDot = "docker cp Hydrogen_Env:home/Hydrogen/MVICFG/BuildNinja/MVICFG.dot mydot.dot";
+	
+	///home/Hydrogen/MVICFG/TestPrograms/Buggy
+	
+	//sudo docke exec Hydrogen_Env 
+	// wxString comp1 ="sudo docker exec clang -c -O0 -Xclang -disable-O0-optnone -g -emit-llvm -S /home/Hydrogen/MVICFG/TestPrograms/Buggy/Prog.c -o /home/Hydrogen/MVICFG/TestPrograms/Buggy/ProgV1.bc";
+	// wxArrayString out1 = doExecute(comp1);
+	// ///home/Hydrogen/MVICFG/TestPrograms/Correct
+	//wxString comp2 = "sudo docker exec Hydrogen_Env clang -c -O0 -Xclang -disable-O0-optnone -g -emit-llvm -S /home/Hydrogen/MVICFG/TestPrograms/Correct/Prog.c -o /home/Hydrogen/MVICFG/TestPrograms/Correct/ProgV2.bc";
+	// wxArrayString out2 = doExecute(com
+	// wxString del1 = "sudo docker exec Hydrogen_Env rm " + pathToProg2 +"ProgV2.bc";
+
+	// + pathToProg2 + "ProgV2.bc :: "+ pathToProg1 +"Prog.c :: "+pathToProg2+"Prog.c";
+	wxArrayString dumpScript = doExecute(dropScript);
+	std::cout<<"\n" + pathToScript + "\n";
+	// wxString tryit = pathToHydro +" "+ pathToProg1 + "ProgV1.bc " + pathToProg2 + "ProgV2.bc "+ "::"  + pathToProg1 +" :: "+pathToProg2 + "Prog.c";
+	wxArrayString hydroOut=doExecute(pathToScript);
+
+	wxArrayString snagDot=doExecute(pickupDot);
+	// wxArrayString snagDot = doExecute();
+	// wxArrayString oot = doExecute(tryit);
+	// doExecute(del);
+	// doExecute(del1)++++++++
+}
 
 /**
  * OnExec 
@@ -55,9 +92,10 @@ void MainWindow::OnExit(wxCommandEvent& event) {
  */
 void MainWindow::OnExec(wxCommandEvent& event)
 {
+	generateGraph();
 	//working example of interacting with docker with our app 
-	wxString test = "sudo docker exec Hydrogen_Env git clone https://github.com/iowastateuniversity-programanalysis/hydrogen.git /home/Hydrogen/MVICFG"; 
-	wxArrayString out = doExecute(test);
+	// wxString test = "sudo docker exec Hydrogen_Env git clone https://github.com/iowastateuniversity-programanalysis/hydrogen.git /home/Hydrogen/MVICFG"; 
+	// wxArrayString out = doExecute(test);
 }
 /**
  * doExecute
