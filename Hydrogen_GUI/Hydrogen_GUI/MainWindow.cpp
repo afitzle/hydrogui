@@ -55,6 +55,7 @@ void MainWindow::OnExit(wxCommandEvent& event) {
  */
 void MainWindow::OnExec(wxCommandEvent& event)
 {
+	//working example of interacting with docker with our app 
 	wxString test = "sudo docker exec Hydrogen_Env git clone https://github.com/iowastateuniversity-programanalysis/hydrogen.git /home/Hydrogen/MVICFG"; 
 	wxArrayString out = doExecute(test);
 }
@@ -71,17 +72,23 @@ wxArrayString MainWindow::doExecute(wxString& cmd)
 {
 	wxArrayString output, errors;
 	int code = wxExecute(cmd, output, errors);
-	size_t count = output.GetCount();
+	size_t outputCount = output.GetCount();
+	size_t errorCount = errors.GetCount();
 	//no output
-	if (!count) return output;
+	// if (!outputCount) return output;
 	
-	std::cout << cmd.c_str() + "\n";
-	std::cout << "whatever\n";
+	// std::cout << cmd.c_str() + "\n";
 	//prints output (debugging purposes)		
-	for ( size_t n = 0; n < count; n++ )
+	for ( size_t n = 0; n < outputCount; n++ )
     {
-        std::cout<< output[n].c_str() + "\n";
+		std::cout<< output[n].c_str() + "\n";
     }
+	
+	for ( size_t n = 0; n < errorCount; n++ )
+    {
+        std::cout<< errors[n].c_str() + "\n";
+    }
+
 	return output;
 }
 
