@@ -266,12 +266,10 @@ void MainWindow::selectFiles(int MODE)
 							"C Files (*.c)|*.c", wxFD_MULTIPLE, wxDefaultPosition);
 		if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 		{
-		std::cout << "Here" << std::endl;
 		wxArrayString CurrentDocPaths;
 		OpenDialog->GetPaths(CurrentDocPaths);
 		OpenDialog->GetPaths(fixedFilesAbsolute);
 		OpenDialog->GetFilenames(fixedFileNames);
-		std::cout << CurrentDocPaths.GetCount() << std::endl;
 		int count = CurrentDocPaths.GetCount();
 		int i;
 		for(i=0; i<count; i++){
