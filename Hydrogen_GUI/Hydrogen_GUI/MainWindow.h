@@ -20,6 +20,7 @@ public:
 	void OnExec(wxCommandEvent& event);
 	void generateGraph();
 	wxArrayString doExecute(wxString& cmd);
+	void selectSource(wxCommandEvent& WXUNUSED(event));
 	~MainWindow();
 };
 
