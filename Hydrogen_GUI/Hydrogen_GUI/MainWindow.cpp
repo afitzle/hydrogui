@@ -1,4 +1,10 @@
 #include "MainWindow.h"
+//Coords for right and left side of window
+#define RIGHT 140
+#define LEFT 50
+//Flags harvest buggy/fixed files
+#define BUGGY 0
+#define FIXED 1
 
 MainWindow::MainWindow(wxWindow *parent,
 	wxWindowID id,
@@ -10,13 +16,13 @@ MainWindow::MainWindow(wxWindow *parent,
 	wxFrame(parent, id, title, pos, size, style, name)
 {
     wxMenuBar *menuBar = new wxMenuBar;
-			wxMenu *menuFile = new wxMenu;
-			wxMenu *menuConsole = new wxMenu;
-	    menuFile->Append(1, "&Help...\tCtrl-H",
-                     "Redirects to hydrogui git repository");
-		menuConsole->Append(2, "&Install Hydrogen in Docker..\tCtrl-H",
-                     "Redirects to hydrogui git repository");			 
-    menuBar->Append(menuFile, "About");
+	wxMenu *menuFile = new wxMenu;
+	wxMenu *menuConsole = new wxMenu;
+	menuFile->Append(1, "&Help...\tCtrl-H",
+					"Redirects to hydrogui git repository");
+	menuConsole->Append(2, "&Run Hydrogen..\tCtrl-H",
+					"Run Hydrogen and transfer dotfile");			 
+		menuBar->Append(menuFile, "About");
 	menuBar->Append(menuConsole, "Console");
     SetMenuBar( menuBar );
 
@@ -30,9 +36,17 @@ MainWindow::MainWindow(wxWindow *parent,
 
     wxButton* graphBtn = new wxButton(panel, 4, "Select MVICFG", wxPoint(10,50),wxSize(125, 50));
     Bind(wxEVT_BUTTON, &MainWindow::SelectMVICFG, this, 4);
-    wxButton* sourceBtn = new wxButton(panel, 5, "Select Source Files", wxPoint(140,50),wxSize(135, 50));
-    Bind(wxEVT_BUTTON, &MainWindow::selectSource, this, 5);
-	wxButton* btn = new wxButton(panel, wxID_ANY, "Button", wxPoint(250,100),wxSize(100, 50));
+    wxButton* buggyBtn = new wxButton(panel, 5, "Select Buggy Files", wxPoint(RIGHT,50),wxSize(150, 50));
+    wxButton* fixedBtn = new wxButton(panel, 6, "Select Fixed Files", wxPoint(RIGHT,100),wxSize(150, 50));
+	
+	// wxButton* showFiles = new wxButton(panel, 7, "List files", wxPoint(RIGHT,150),wxSize(150, 50));
+	
+	
+	
+	Bind(wxEVT_BUTTON, &MainWindow::selectSource, this, 5);
+	Bind(wxEVT_BUTTON, &MainWindow::selectFixed, this, 6);
+	// Bind(wxEVT_BUTTON, &MainWindow::ListBuggyAndFixedFiles, this, 7);
+	// wxButton* btn = new wxButton(panel, wxID_ANY, "Button", wxPoint(250,100),wxSize(100, 50));
 	
 	Bind(wxEVT_MENU, &MainWindow::OnAbout, this, 1);
 	Bind(wxEVT_MENU, &MainWindow::OnExec, this, 2);
@@ -95,9 +109,6 @@ void MainWindow::generateGraph()
 void MainWindow::OnExec(wxCommandEvent& event)
 {
 	generateGraph();
-	//working example of interacting with docker with our app 
-	// wxString test = "sudo docker exec Hydrogen_Env git clone https://github.com/iowastateuniversity-programanalysis/hydrogen.git /home/Hydrogen/MVICFG"; 
-	// wxArrayString out = doExecute(test);
 }
 /**
  * doExecute
@@ -113,12 +124,7 @@ wxArrayString MainWindow::doExecute(wxString& cmd)
 	wxArrayString output, errors;
 	int code = wxExecute(cmd, output, errors);
 	size_t outputCount = output.GetCount();
-	size_t errorCount = errors.GetCount();
-	//no output
-	// if (!outputCount) return output;
-	
-	// std::cout << cmd.c_str() + "\n";
-	//prints output (debugging purposes)		
+	size_t errorCount = errors.GetCount();	
 	for ( size_t n = 0; n < outputCount; n++ )
     {
 		std::cout<< output[n].c_str() + "\n";
@@ -142,28 +148,135 @@ void MainWindow::OnAbout(wxCommandEvent& event)
     }
 }
 
+/**
+ * selectSource 
+ * Obtain buggy files from dialogue
+ * @param  {wxCommandEvent} WXUNUSED(event) : 
+ */
 void MainWindow::selectSource(wxCommandEvent& WXUNUSED(event))
 {
-    wxFileDialog* OpenDialog = new wxFileDialog(this, ("Select the Source Files to View"), wxEmptyString, wxEmptyString,
-						"C Files (*.c)|*.c", wxFD_MULTIPLE, wxDefaultPosition);
-    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
-    {
-      std::cout << "Here" << std::endl;
-      wxArrayString CurrentDocPaths;
-      OpenDialog->GetPaths(CurrentDocPaths);
-      std::cout << CurrentDocPaths.GetCount() << std::endl;
-      int count = CurrentDocPaths.GetCount();
-      int i;
-      for(i=0; i<count; i++){
-	std::cout << CurrentDocPaths.Item(i) << std::endl;
-      }
-            // Sets our current document to the file the user selected
-            //system("xdot " + CurrentDocPath);
-    }
+	selectFiles(BUGGY);    
+}
 
-    // Clean up after ourselves
-    OpenDialog->Destroy();
-    
+/**
+ * selectFixed
+ * Obtain buggy files from dialogue
+ * @param  {wxCommandEvent} WXUNUSED(event) : 
+ */
+void MainWindow::selectFixed (wxCommandEvent& WXUNUSED(event))
+{
+	selectFiles(FIXED);
+	ListBuggyAndFixedFiles();    
+	TransferBuggyAndFixedFiles();
+}
+
+/**
+ * selectFiles
+ * Handles buggy and fixed file info.
+ * Obtains an absolute path and file name for all files and
+ * stores them in
+ *  wxArrayString buggyFilesAbsolute (absolute)
+ *  wxArrayString fixedFilesAbsolute (absolute)
+ * 	wxArrayString fixedFileNames (filename)
+ *  wxArrayString buggyFileNames (filename)
+ * Respectively.
+ * @param  {int} MODE : BUGGY or FIXED files to be handled
+ */
+void MainWindow::selectFiles(int MODE)
+{
+	//mode is either BUGGY or FIXED
+	if(MODE == BUGGY)
+	{
+			wxFileDialog* OpenDialog = new wxFileDialog(this, ("Select the Source Files to View"), wxEmptyString, wxEmptyString,
+							"C Files (*.c)|*.c", wxFD_MULTIPLE, wxDefaultPosition);
+		if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+		{
+		std::cout << "Here" << std::endl;
+		wxArrayString CurrentDocPaths;
+		OpenDialog->GetPaths(buggyFilesAbsolute);
+		OpenDialog->GetFilenames(buggyFileNames);
+		std::cout << CurrentDocPaths.GetCount() << std::endl;
+		int count = CurrentDocPaths.GetCount();
+		int i;
+		for(i=0; i<count; i++){
+			std::cout << "Added Buggy File(s): " <<CurrentDocPaths.Item(i) << std::endl;
+			}
+				
+		OpenDialog->Destroy();		
+		}
+		
+		}
+
+	if(MODE == FIXED)
+	{
+
+			wxFileDialog* OpenDialog = new wxFileDialog(this, ("Select the Source Files to View"), wxEmptyString, wxEmptyString,
+							"C Files (*.c)|*.c", wxFD_MULTIPLE, wxDefaultPosition);
+		if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+		{
+		std::cout << "Here" << std::endl;
+		wxArrayString CurrentDocPaths;
+		OpenDialog->GetPaths(CurrentDocPaths);
+		OpenDialog->GetPaths(fixedFilesAbsolute);
+		OpenDialog->GetFilenames(fixedFileNames);
+		std::cout << CurrentDocPaths.GetCount() << std::endl;
+		int count = CurrentDocPaths.GetCount();
+		int i;
+		for(i=0; i<count; i++){
+			std::cout << "Added Fixed File(s): " <<CurrentDocPaths.Item(i) << std::endl;
+			
+		}
+				
+		OpenDialog->Destroy();
+	}
+	
+	}
+
+
+	
+}
+
+void MainWindow::TransferBuggyAndFixedFiles()
+{
+	int countFixed = this->fixedFilesAbsolute.GetCount();
+	wxString fixedFileCmd;
+	
+	int countBuggy = this->buggyFilesAbsolute.GetCount();
+	wxString buggyFileCmd;
+
+	int i = 0;
+	std::cout << "---Transfering buggy and fixed files---" << std::endl;
+	for(i=0; i<countBuggy; i++){
+			// std::cout << "buggy["<<i<<"]:" << buggyFiles.Item(i) << std::endl;
+			buggyFileCmd = "sudo docker cp "+ buggyFilesAbsolute.Item(i) + " Hydrogen_Env:/home/Hydrogen/MVICFG/TestPrograms/Buggy/"+buggyFileNames.Item(i);
+			std::cout << "buggy["<<i<<"]:" << buggyFileCmd.c_str() << std::endl;
+			doExecute(buggyFileCmd);
+	}
+
+	for(i=0; i < countFixed ; i++){
+			// std::cout << "fixed["<<i<<"]:" << fixedFiles.Item(i) << std::endl;
+			fixedFileCmd = "sudo docker cp "+ fixedFilesAbsolute.Item(i) + " Hydrogen_Env:/home/Hydrogen/MVICFG/TestPrograms/Correct/"+fixedFileNames.Item(i);
+			std::cout << "fixed["<<i<<"]:" << fixedFileCmd.c_str() << std::endl;
+			doExecute(fixedFileCmd);
+	}
+	std::cout << "---		Transferring Done		---" << std::endl;
+}
+
+void MainWindow::ListBuggyAndFixedFiles()
+{
+	int countFixed = this->fixedFilesAbsolute.GetCount();
+	int countBuggy = this->buggyFilesAbsolute.GetCount();
+	int i = 0;
+	std::cout << "---Listing buggy and fixed files---" << std::endl;
+	for(i=0; i<countBuggy; i++){
+			std::cout << "buggy["<<i<<"]:" << buggyFilesAbsolute.Item(i) << std::endl;
+	}
+
+	for(i=0; i < countBuggy ; i++){
+			std::cout << "fixed["<<i<<"]:" << fixedFilesAbsolute.Item(i) << std::endl;
+	}
+
+	std::cout << "---End buggy and fixed files	---" << std::endl;
 }
 
 void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
@@ -174,6 +287,8 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 	if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
 		wxString CurrentDocPath = OpenDialog->GetPath();
+		// OpenDialog->GetPaths(buggyFilesAbsolute);
+		// OpenDialog->GetFilenames(buggyFileNames);
 		// Sets our current document to the file the user selected
 		system("xdot " + CurrentDocPath);
 	}
