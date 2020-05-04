@@ -18,11 +18,15 @@ MainWindow::MainWindow(wxWindow *parent,
     wxMenuBar *menuBar = new wxMenuBar;
 	wxMenu *menuFile = new wxMenu;
 	wxMenu *menuConsole = new wxMenu;
+	wxMenu *menuCleanFiles = new wxMenu;
 	menuFile->Append(1, "&Help...\tCtrl-H",
 					"Redirects to hydrogui git repository");
 	menuConsole->Append(2, "&Run Hydrogen..\tCtrl-H",
-					"Run Hydrogen and transfer dotfile");			 
-		menuBar->Append(menuFile, "About");
+					"Run Hydrogen and transfer dotfile");
+	menuConsole->Append(8,"&Clean Remote Files..\tCtrl-G",
+					"Delete remote files");						 
+	
+	menuBar->Append(menuFile, "About");
 	menuBar->Append(menuConsole, "Console");
     SetMenuBar( menuBar );
 
@@ -50,6 +54,7 @@ MainWindow::MainWindow(wxWindow *parent,
 	
 	Bind(wxEVT_MENU, &MainWindow::OnAbout, this, 1);
 	Bind(wxEVT_MENU, &MainWindow::OnExec, this, 2);
+	Bind(wxEVT_MENU,&MainWindow::OnClean, this, 8);
 }
 
 
@@ -138,6 +143,40 @@ wxArrayString MainWindow::doExecute(wxString& cmd)
 	return output;
 }
 
+/**
+ * OnClean 
+ * Checks for on hydrogen image and deletes them.
+ * @param  {wxCommandEvent} (event : 
+ */
+void MainWindow::OnClean(wxCommandEvent& (event))
+{
+
+	int i, j;
+	wxString lsCmdBuggy = "sudo docker exec Hydrogen_Env ls /home/Hydrogen/MVICFG/TestPrograms/Buggy/";
+	wxString lsCmdCorrect = "sudo docker exec Hydrogen_Env ls /home/Hydrogen/MVICFG/TestPrograms/Correct/";
+	wxString cleanBuggy = "sudo docker exec Hydrogen_Env rm  /home/Hydrogen/MVICFG/TestPrograms/Buggy/";
+	wxString cleanCorrect = "sudo docker exec Hydrogen_Env rm /home/Hydrogen/MVICFG/TestPrograms/Correct/";
+	
+	wxArrayString deletedBuggy;
+	wxArrayString deletedCorrect;
+	
+	// buggyFileCmd = "sudo docker rm Hydrogen_Env:/home/Hydrogen/MVICFG/TestPrograms/Buggy/"+buggyFileNames.Item(i);
+	std::cout<<"---Found buggy 	files---"<<std::endl;
+	deletedBuggy = doExecute(lsCmdBuggy);
+	std::cout<<"---Found correct files---"<<std::endl;
+	deletedCorrect = doExecute(lsCmdCorrect);
+
+	for(i =0; i < deletedBuggy.GetCount(); i++)
+	{
+		doExecute(cleanBuggy.Clone().append(deletedBuggy.Item(i)));
+	}
+	for(j =0; j < deletedCorrect.GetCount(); j++)
+	{
+		doExecute(cleanCorrect.Clone().append(deletedCorrect.Item(j)));
+	}
+	std::cout<<"------Cleaned-------"<<std::endl;
+
+}
 
 void MainWindow::OnAbout(wxCommandEvent& event)
 {
@@ -146,6 +185,7 @@ void MainWindow::OnAbout(wxCommandEvent& event)
     {
         wxLogError(wxT("Failed to open URL \"%s\""), s_url.c_str());
     }
+	
 }
 
 /**
@@ -236,6 +276,12 @@ void MainWindow::selectFiles(int MODE)
 	
 }
 
+
+/**
+ * TransferBuggyAndFixedFiles 
+ * Puts files in their respective places on the hydrogen docker
+ * container
+ */
 void MainWindow::TransferBuggyAndFixedFiles()
 {
 	int countFixed = this->fixedFilesAbsolute.GetCount();
@@ -261,7 +307,11 @@ void MainWindow::TransferBuggyAndFixedFiles()
 	}
 	std::cout << "---		Transferring Done		---" << std::endl;
 }
-
+/**
+ * ListBuggyAndFixedFiles
+ * Prints filepaths of currently stored files obtained
+ * through the file selector.
+ */
 void MainWindow::ListBuggyAndFixedFiles()
 {
 	int countFixed = this->fixedFilesAbsolute.GetCount();

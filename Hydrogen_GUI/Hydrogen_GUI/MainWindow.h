@@ -29,6 +29,7 @@ public:
 	void selectFiles(int MODE);
 	void selectFixed (wxCommandEvent& WXUNUSED(event));
 	void TransferBuggyAndFixedFiles();
+	void OnClean(wxCommandEvent& (event));
 	~MainWindow();
 };
 
