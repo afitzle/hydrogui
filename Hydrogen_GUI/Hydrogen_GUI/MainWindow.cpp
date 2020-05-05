@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 //Coords for right and left side of window
-#define RIGHT 140
-#define LEFT 50
+#define RIGHT 200
+#define LEFT 10
 //Flags harvest buggy/fixed files
 #define BUGGY 0
 #define FIXED 1
@@ -32,16 +32,8 @@ MainWindow::MainWindow(wxWindow *parent,
 
 	wxPanel* panel = new wxPanel(this);
 
-
-	 			
-    wxTextCtrl *text = new wxTextCtrl(panel, wxID_ANY, "", wxPoint(10,10), wxSize(140, 30), 0,
-					  wxDefaultValidator, wxTextCtrlNameStr);
-
-
-    wxButton* graphBtn = new wxButton(panel, 4, "Select MVICFG", wxPoint(10,50),wxSize(125, 50));
-    Bind(wxEVT_BUTTON, &MainWindow::SelectMVICFG, this, 4);
-    wxButton* buggyBtn = new wxButton(panel, 5, "Select Buggy Files", wxPoint(RIGHT,50),wxSize(150, 50));
-    wxButton* fixedBtn = new wxButton(panel, 6, "Select Fixed Files", wxPoint(RIGHT,100),wxSize(150, 50));
+    wxButton* buggyBtn = new wxButton(panel, 5, "Select Buggy Files", wxPoint(LEFT,10),wxSize(150, 50));
+    wxButton* fixedBtn = new wxButton(panel, 6, "Select Fixed Files", wxPoint(RIGHT,10),wxSize(150, 50));
 	
 	// wxButton* showFiles = new wxButton(panel, 7, "List files", wxPoint(RIGHT,150),wxSize(150, 50));
 	

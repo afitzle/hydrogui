@@ -1,7 +1,7 @@
 #include "App.h"
 #include "id.h"
 #include "MainWindow.h"
-#include<wx/textctrl.h>
+#include <wx/textctrl.h>
 IMPLEMENT_APP(App); //main
 
 App::App()
@@ -15,7 +15,9 @@ bool App::OnInit()
 	}
 	MainWindow *main = new MainWindow(nullptr,
 		window::id::MAINWINDOW,
-		_("Main Window"));
+		_("Main Window"),
+		wxPoint(100,50),
+		wxSize(380,500));
 	main->Show();
 	SetTopWindow(main);
 	return true;
