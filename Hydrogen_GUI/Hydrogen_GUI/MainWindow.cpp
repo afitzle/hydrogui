@@ -21,8 +21,10 @@ MainWindow::MainWindow(wxWindow *parent,
 	wxMenu *menuCleanFiles = new wxMenu;
 	menuFile->Append(1, "&Help...\tCtrl-H",
 					"Redirects to hydrogui git repository");
+
 	menuConsole->Append(2, "&Run Hydrogen..\tCtrl-H",
 					"Run Hydrogen and transfer dotfile");
+
 	menuConsole->Append(8,"&Clean Remote Files..\tCtrl-G",
 					"Delete remote files");						 
 	
@@ -34,10 +36,13 @@ MainWindow::MainWindow(wxWindow *parent,
 
     wxButton* buggyBtn = new wxButton(panel, 5, "Select Buggy Files", wxPoint(LEFT,10),wxSize(150, 50));
     wxButton* fixedBtn = new wxButton(panel, 6, "Select Fixed Files", wxPoint(RIGHT,10),wxSize(150, 50));
+
+	wxTextCtrl* log = new wxTextCtrl(panel, id,"", wxPoint(LEFT,75), wxSize(340,200),wxTE_MULTILINE|wxTE_READONLY);
+
+	addTextToTextBox(log, "Hello");
+	addTextToTextBox(log, "\nWorld!");
 	
 	// wxButton* showFiles = new wxButton(panel, 7, "List files", wxPoint(RIGHT,150),wxSize(150, 50));
-	
-	
 	
 	Bind(wxEVT_BUTTON, &MainWindow::selectSource, this, 5);
 	Bind(wxEVT_BUTTON, &MainWindow::selectFixed, this, 6);
@@ -337,4 +342,11 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 
 	// Clean up after ourselves
 	OpenDialog->Destroy();
+}
+
+void MainWindow::addTextToTextBox(wxTextCtrl *textBox, wxString str) {
+	textBox->Freeze();
+	textBox->AppendText(str);
+	//textBox->ScrollLines(1);
+	textBox->Thaw();
 }

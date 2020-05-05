@@ -14,10 +14,11 @@ public:
 		const wxSize& size = wxDefaultSize,
 		long style = wxDEFAULT_FRAME_STYLE,
 		const wxString& name = wxFrameNameStr);
-		wxArrayString buggyFilesAbsolute;
-		wxArrayString fixedFilesAbsolute;
-		wxArrayString fixedFileNames;
-		wxArrayString buggyFileNames;
+	~MainWindow();
+	wxArrayString buggyFilesAbsolute;
+	wxArrayString fixedFilesAbsolute;
+	wxArrayString fixedFileNames;
+	wxArrayString buggyFileNames;
 	void OnExit(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void SelectMVICFG(wxCommandEvent& WXUNUSED(event));
@@ -30,6 +31,6 @@ public:
 	void selectFixed (wxCommandEvent& WXUNUSED(event));
 	void TransferBuggyAndFixedFiles();
 	void OnClean(wxCommandEvent& (event));
-	~MainWindow();
+	void addTextToTextBox(wxTextCtrl *textBox, wxString str);
 };
 

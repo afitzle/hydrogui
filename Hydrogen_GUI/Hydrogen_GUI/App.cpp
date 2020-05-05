@@ -17,7 +17,7 @@ bool App::OnInit()
 		window::id::MAINWINDOW,
 		_("Main Window"),
 		wxPoint(100,50),
-		wxSize(380,500));
+		wxSize(375,350));
 	main->Show();
 	SetTopWindow(main);
 	return true;
