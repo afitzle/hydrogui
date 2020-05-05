@@ -4,6 +4,14 @@
 #ifndef WX_PRECOMP
 	#include <wx/wx.h>
 #endif
+
+typedef struct Count {
+	unsigned num_edges;
+	unsigned num_nodes;
+	unsigned paths_added;
+	unsigned paths_removed;
+}count_t;
+
 class MainWindow : public wxFrame
 {
 public:
@@ -31,6 +39,13 @@ public:
 	void selectFixed (wxCommandEvent& WXUNUSED(event));
 	void TransferBuggyAndFixedFiles();
 	void OnClean(wxCommandEvent& (event));
-	void addTextToTextBox(wxTextCtrl *textBox, wxString str);
+	
+
+private:
+	wxTextCtrl* log;
+private:
+	void addTextToTextBox(wxTextCtrl *textBox, std::string str);
+	void parse_dot_file(std::string filename);
+
 };
 

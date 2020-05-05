@@ -1,4 +1,8 @@
+#include <iostream>
+#include <fstream>
+#include <regex>
 #include "MainWindow.h"
+
 //Coords for right and left side of window
 #define RIGHT 200
 #define LEFT 10
@@ -37,10 +41,9 @@ MainWindow::MainWindow(wxWindow *parent,
     wxButton* buggyBtn = new wxButton(panel, 5, "Select Buggy Files", wxPoint(LEFT,10),wxSize(150, 50));
     wxButton* fixedBtn = new wxButton(panel, 6, "Select Fixed Files", wxPoint(RIGHT,10),wxSize(150, 50));
 
-	wxTextCtrl* log = new wxTextCtrl(panel, id,"", wxPoint(LEFT,75), wxSize(340,200),wxTE_MULTILINE|wxTE_READONLY);
+	log = new wxTextCtrl(panel, id,"", wxPoint(LEFT,75), wxSize(340,200),wxTE_MULTILINE|wxTE_READONLY);
 
-	addTextToTextBox(log, "Hello");
-	addTextToTextBox(log, "\nWorld!");
+	//parse_dot_file("mydot.dot");
 	
 	// wxButton* showFiles = new wxButton(panel, 7, "List files", wxPoint(RIGHT,150),wxSize(150, 50));
 	
@@ -111,6 +114,7 @@ void MainWindow::generateGraph()
 void MainWindow::OnExec(wxCommandEvent& event)
 {
 	generateGraph();
+	parse_dot_file("mydot.dot");
 }
 /**
  * doExecute
@@ -148,7 +152,7 @@ wxArrayString MainWindow::doExecute(wxString& cmd)
 void MainWindow::OnClean(wxCommandEvent& (event))
 {
 
-	int i, j;
+	unsigned int i, j;
 	wxString lsCmdBuggy = "sudo docker exec Hydrogen_Env ls /home/Hydrogen/MVICFG/TestPrograms/Buggy/";
 	wxString lsCmdCorrect = "sudo docker exec Hydrogen_Env ls /home/Hydrogen/MVICFG/TestPrograms/Correct/";
 	wxString cleanBuggy = "sudo docker exec Hydrogen_Env rm  /home/Hydrogen/MVICFG/TestPrograms/Buggy/";
@@ -344,9 +348,47 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 	OpenDialog->Destroy();
 }
 
-void MainWindow::addTextToTextBox(wxTextCtrl *textBox, wxString str) {
+void MainWindow::parse_dot_file(std::string filename) {
+
+	count_t count;
+	count.num_edges = 0;
+	count.num_nodes = 0;
+	count.paths_added = 0;
+	count.paths_removed = 0;
+	std::string line;
+	std::ifstream file(filename);
+	std::regex node_regex("\"[0-9]+\" \\[label=");
+	std::regex edge_regex("->");
+	std::regex path_add_regex("V2::Branch");
+	std::regex path_sub_regex("V1::Branch");
+	if (file.is_open()) {
+
+		while (std::getline(file, line)) {
+			if (std::regex_search(line, node_regex)) {
+				count.num_nodes += 1;
+			}
+			if (std::regex_search(line, edge_regex)) {
+				count.num_edges += 1;
+			}
+			if (std::regex_search(line, path_add_regex)) {
+				count.paths_added += 1;
+			}
+			if (std::regex_search(line, path_sub_regex)) {
+				count.paths_removed += 1;
+			}
+		}
+	}
+
+	addTextToTextBox(log, "Number of Nodes: " + std::to_string(count.num_nodes));
+	addTextToTextBox(log, "\nNumber of Edges: " + std::to_string(count.num_edges));
+	addTextToTextBox(log, "\nPaths added: " + std::to_string(count.paths_added));
+	addTextToTextBox(log, "\nPaths removed: " + std::to_string(count.paths_removed));
+}
+
+void MainWindow::addTextToTextBox(wxTextCtrl *textBox, std::string str) {
+
+	wxString wxStr(str.c_str(), wxConvUTF8);
 	textBox->Freeze();
-	textBox->AppendText(str);
-	//textBox->ScrollLines(1);
+	textBox->AppendText(wxStr);
 	textBox->Thaw();
 }
