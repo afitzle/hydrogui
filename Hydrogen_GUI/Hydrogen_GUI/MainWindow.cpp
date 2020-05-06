@@ -247,7 +247,6 @@ void MainWindow::selectFiles(int MODE)
 		{
 		OpenDialog->GetPaths(buggyFilesAbsolute);
 		OpenDialog->GetFilenames(buggyFileNames);
-		std::cout << buggyFilesAbsolute.GetCount() << std::endl;
 		int count = buggyFilesAbsolute.GetCount();
 		int i;
 		for(i=0; i<count; i++){
