@@ -359,7 +359,6 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 		system("xdot " + CurrentDocPath);
 	}
 
-	// Clean up after ourselves
 	OpenDialog->Destroy();
 }
 
