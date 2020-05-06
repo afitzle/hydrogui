@@ -387,7 +387,7 @@ void MainWindow::parse_dot_file(std::string filename) {
 			}
 		}
 	}
-
+        clearTextBox(log);
 	addTextToTextBox(log, "Number of Nodes: " + std::to_string(count.num_nodes));
 	addTextToTextBox(log, "\nNumber of Edges: " + std::to_string(count.num_edges));
 	addTextToTextBox(log, "\nPaths added: " + std::to_string(count.paths_added));
@@ -396,7 +396,7 @@ void MainWindow::parse_dot_file(std::string filename) {
 
 void MainWindow::addTextToTextBox(wxTextCtrl *textBox, std::string str) {
 
-	wxString wxStr(str.c_str(), wxConvUTF8);
+        wxString wxStr(str.c_str(), wxConvUTF8);
 	textBox->Freeze();
 	textBox->AppendText(wxStr);
 	textBox->Thaw();
