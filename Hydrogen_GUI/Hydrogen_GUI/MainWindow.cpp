@@ -41,10 +41,11 @@ MainWindow::MainWindow(wxWindow *parent,
     wxButton* buggyBtn = new wxButton(panel, 5, "Select Buggy Files", wxPoint(LEFT,10),wxSize(150, 50));
     wxButton* fixedBtn = new wxButton(panel, 6, "Select Fixed Files", wxPoint(RIGHT,10),wxSize(150, 50));
 
-	log = new wxTextCtrl(panel, id,"", wxPoint(LEFT,75), wxSize(340,200),wxTE_MULTILINE|wxTE_READONLY);
+	log = new wxTextCtrl(panel, wxID_OK,"", wxPoint(LEFT,75), wxSize(340,200),wxTE_MULTILINE|wxTE_READONLY);
 
 	//parse_dot_file("mydot.dot");
-	
+	//clearTextBox(log);
+
 	// wxButton* showFiles = new wxButton(panel, 7, "List files", wxPoint(RIGHT,150),wxSize(150, 50));
 	
 	Bind(wxEVT_BUTTON, &MainWindow::selectSource, this, 5);
@@ -341,7 +342,7 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 		// OpenDialog->GetPaths(buggyFilesAbsolute);
 		// OpenDialog->GetFilenames(buggyFileNames);
 		// Sets our current document to the file the user selected
-		system("xdot " + CurrentDocPath);
+		//system("xdot " + CurrentDocPath);
 	}
 
 	// Clean up after ourselves
@@ -391,4 +392,12 @@ void MainWindow::addTextToTextBox(wxTextCtrl *textBox, std::string str) {
 	textBox->Freeze();
 	textBox->AppendText(wxStr);
 	textBox->Thaw();
+}
+
+void MainWindow::clearTextBox(wxTextCtrl *textBox) {
+	const int numOfLines = textBox->GetNumberOfLines();
+	for (int i = 0; i < numOfLines; ++i) {
+		long length = textBox->GetLineLength(i);
+		textBox->Remove(0, length);
+	}
 }

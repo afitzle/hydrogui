@@ -46,6 +46,6 @@ private:
 private:
 	void addTextToTextBox(wxTextCtrl *textBox, std::string str);
 	void parse_dot_file(std::string filename);
-
+	void clearTextBox(wxTextCtrl *textBox);
 };
 
