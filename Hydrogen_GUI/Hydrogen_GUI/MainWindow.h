@@ -39,6 +39,7 @@ public:
 	void selectFixed (wxCommandEvent& WXUNUSED(event));
 	void TransferBuggyAndFixedFiles();
 	void OnClean(wxCommandEvent& (event));
+	void checkDockerInit();
 	
 
 private:

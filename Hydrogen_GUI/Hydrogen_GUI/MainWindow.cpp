@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <regex>
+#include <wx/popupwin.h>
 #include "MainWindow.h"
 
 //Coords for right and left side of window
@@ -23,7 +24,9 @@ MainWindow::MainWindow(wxWindow *parent,
 	wxMenu *menuFile = new wxMenu;
 	wxMenu *menuConsole = new wxMenu;
 	wxMenu *menuCleanFiles = new wxMenu;
-	menuFile->Append(1, "&Help...\tCtrl-H",
+		menuFile->Append(9, "&Open .dot file...\tCtrl-D",
+	"Open a .dot file from local filesystem");
+	menuFile->Append(1, "&About...\tCtrl-H",
 					"Redirects to hydrogui git repository");
 
 	menuConsole->Append(2, "&Run Hydrogen..\tCtrl-H",
@@ -32,8 +35,8 @@ MainWindow::MainWindow(wxWindow *parent,
 	menuConsole->Append(8,"&Clean Remote Files..\tCtrl-G",
 					"Delete remote files");						 
 	
-	menuBar->Append(menuFile, "About");
-	menuBar->Append(menuConsole, "Console");
+	menuBar->Append(menuFile, "File");
+	menuBar->Append(menuConsole, "Execute");
     SetMenuBar( menuBar );
 
 	wxPanel* panel = new wxPanel(this);
@@ -50,6 +53,7 @@ MainWindow::MainWindow(wxWindow *parent,
 	
 	Bind(wxEVT_BUTTON, &MainWindow::selectSource, this, 5);
 	Bind(wxEVT_BUTTON, &MainWindow::selectFixed, this, 6);
+	Bind(wxEVT_MENU, &MainWindow::SelectMVICFG, this, 9);
 	// Bind(wxEVT_BUTTON, &MainWindow::ListBuggyAndFixedFiles, this, 7);
 	// wxButton* btn = new wxButton(panel, wxID_ANY, "Button", wxPoint(250,100),wxSize(100, 50));
 	
@@ -67,6 +71,17 @@ void MainWindow::OnExit(wxCommandEvent& event) {
 	Close(TRUE);
 }
 
+/**
+ * checkDockerInit 
+ * Starts Hydrogen_Env if the container is stopped
+ * when the hydrogui program runs.
+ */
+void MainWindow::checkDockerInit()
+{
+	wxString check = "docker start Hydrogen_Env";
+	wxArrayString res = doExecute(check);
+}
+
 
 void MainWindow::generateGraph()
 {
@@ -82,28 +97,26 @@ void MainWindow::generateGraph()
 	wxString pathToProg2=" /home/Hydrogen/MVICFG/TestPrograms/Correct/";
 	wxString dropScript = "docker cp hydro-clang.sh Hydrogen_Env:/home/Hydrogen/MVICFG/hydro-clang.sh";
 	wxString pickupDot = "docker cp Hydrogen_Env:home/Hydrogen/MVICFG/BuildNinja/MVICFG.dot mydot.dot";
-	
-	///home/Hydrogen/MVICFG/TestPrograms/Buggy
-	
-	//sudo docke exec Hydrogen_Env 
-	// wxString comp1 ="sudo docker exec clang -c -O0 -Xclang -disable-O0-optnone -g -emit-llvm -S /home/Hydrogen/MVICFG/TestPrograms/Buggy/Prog.c -o /home/Hydrogen/MVICFG/TestPrograms/Buggy/ProgV1.bc";
-	// wxArrayString out1 = doExecute(comp1);
-	// ///home/Hydrogen/MVICFG/TestPrograms/Correct
-	//wxString comp2 = "sudo docker exec Hydrogen_Env clang -c -O0 -Xclang -disable-O0-optnone -g -emit-llvm -S /home/Hydrogen/MVICFG/TestPrograms/Correct/Prog.c -o /home/Hydrogen/MVICFG/TestPrograms/Correct/ProgV2.bc";
-	// wxArrayString out2 = doExecute(com
-	// wxString del1 = "sudo docker exec Hydrogen_Env rm " + pathToProg2 +"ProgV2.bc";
 
-	// + pathToProg2 + "ProgV2.bc :: "+ pathToProg1 +"Prog.c :: "+pathToProg2+"Prog.c";
 	wxArrayString dumpScript = doExecute(dropScript);
 	std::cout<<"\n" + pathToScript + "\n";
-	// wxString tryit = pathToHydro +" "+ pathToProg1 + "ProgV1.bc " + pathToProg2 + "ProgV2.bc "+ "::"  + pathToProg1 +" :: "+pathToProg2 + "Prog.c";
+	int i = 0;
+
+	//generates popup and exits function if the user hasn't added any files	
+	if(buggyFileNames.GetCount() < 1 || fixedFileNames.GetCount() < 1)
+	{
+		wxPopupWindow *m_simplePopup;
+		m_simplePopup = new wxPopupWindow(this, false );
+    	wxPoint pos = ClientToScreen( wxPoint(0,0) );
+    	wxSize sz = wxSize(50,50);
+    	m_simplePopup->Position( pos, sz );
+    	wxLogMessage( "No files found on Hydrogen's container!", m_simplePopup);
+   	 	m_simplePopup->Show();
+		return;	
+	}
 	wxArrayString hydroOut=doExecute(pathToScript);
 
 	wxArrayString snagDot=doExecute(pickupDot);
-	// wxArrayString snagDot = doExecute();
-	// wxArrayString oot = doExecute(tryit);
-	// doExecute(del);
-	// doExecute(del1)++++++++
 }
 
 /**
@@ -141,7 +154,6 @@ wxArrayString MainWindow::doExecute(wxString& cmd)
     {
         std::cout<< errors[n].c_str() + "\n";
     }
-
 	return output;
 }
 
@@ -309,6 +321,8 @@ void MainWindow::TransferBuggyAndFixedFiles()
 	}
 	std::cout << "---		Transferring Done		---" << std::endl;
 }
+
+
 /**
  * ListBuggyAndFixedFiles
  * Prints filepaths of currently stored files obtained
@@ -342,7 +356,7 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 		// OpenDialog->GetPaths(buggyFilesAbsolute);
 		// OpenDialog->GetFilenames(buggyFileNames);
 		// Sets our current document to the file the user selected
-		//system("xdot " + CurrentDocPath);
+		system("xdot " + CurrentDocPath);
 	}
 
 	// Clean up after ourselves
@@ -383,7 +397,7 @@ void MainWindow::parse_dot_file(std::string filename) {
 	addTextToTextBox(log, "Number of Nodes: " + std::to_string(count.num_nodes));
 	addTextToTextBox(log, "\nNumber of Edges: " + std::to_string(count.num_edges));
 	addTextToTextBox(log, "\nPaths added: " + std::to_string(count.paths_added));
-	addTextToTextBox(log, "\nPaths removed: " + std::to_string(count.paths_removed));
+	addTextToTextBox(log, "\nPaths removed: " + std::to_string(count.paths_removed)+ "\n");
 }
 
 void MainWindow::addTextToTextBox(wxTextCtrl *textBox, std::string str) {

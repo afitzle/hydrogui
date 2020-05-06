@@ -7,3 +7,5 @@ Release/
 .vscode/c_cpp_properties.json
 .vscode/settings.json
 .history/
+Hydrogen_GUI/.vscode/settings.json
+Hydrogen_GUI/.vscode/c_cpp_properties.json

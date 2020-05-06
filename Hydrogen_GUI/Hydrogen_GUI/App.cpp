@@ -15,9 +15,10 @@ bool App::OnInit()
 	}
 	MainWindow *main = new MainWindow(nullptr,
 		window::id::MAINWINDOW,
-		_("Main Window"),
+		_("hydrogui"),
 		wxPoint(100,50),
 		wxSize(375,350));
+	main->checkDockerInit();
 	main->Show();
 	SetTopWindow(main);
 	return true;
