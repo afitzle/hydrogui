@@ -29,10 +29,10 @@ MainWindow::MainWindow(wxWindow *parent,
 	menuFile->Append(1, "&About...\tCtrl-H",
 					"Redirects to hydrogui git repository");
 
-	menuConsole->Append(2, "&Run Hydrogen..\tCtrl-H",
+	menuConsole->Append(2, "&Run Hydrogen..\tCtrl-R",
 					"Run Hydrogen and transfer dotfile");
 
-	menuConsole->Append(8,"&Clean Remote Files..\tCtrl-G",
+	menuConsole->Append(8,"&Clean Remote Files..\tCtrl-S",
 					"Delete remote files");						 
 	
 	menuBar->Append(menuFile, "File");
@@ -196,6 +196,7 @@ void MainWindow::OnClean(wxCommandEvent& (event))
 	buggyFilesAbsolute.clear();
 	fixedFileNames.clear();
 	fixedFilesAbsolute.clear();
+	clearTextBox(log);
 
 
 }
@@ -207,6 +208,8 @@ void MainWindow::OnAbout(wxCommandEvent& event)
     {
         wxLogError(wxT("Failed to open URL \"%s\""), s_url.c_str());
     }
+
+	// system("sudo chromium --no-sandbox http://www.vim.org &");
 	
 }
 
@@ -311,13 +314,13 @@ void MainWindow::TransferBuggyAndFixedFiles()
 	std::cout << "---Transfering buggy and fixed files---" << std::endl;
 	for(i=0; i<countBuggy; i++){
 			// std::cout << "buggy["<<i<<"]:" << buggyFiles.Item(i) << std::endl;
-			buggyFileCmd = "sudo docker cp "+ buggyFilesAbsolute.Item(i) + " Hydrogen_Env:/home/Hydrogen/MVICFG/TestPrograms/Buggy/"+buggyFileNames.Item(i);
+			buggyFileCmd = "sudo docker cp "+ buggyFilesAbsolute.Item(i) + " Hydrogen_Env:/home/Hydrogen/MVICFG/TestPrograms/Buggy/"+"Prog.c";
 			std::cout << "buggy["<<i<<"]:" << buggyFileCmd.c_str() << std::endl;
 			doExecute(buggyFileCmd);
 	}
 
 	for(i=0; i < countFixed ; i++){
-			fixedFileCmd = "sudo docker cp "+ fixedFilesAbsolute.Item(i) + " Hydrogen_Env:/home/Hydrogen/MVICFG/TestPrograms/Correct/"+fixedFileNames.Item(i);
+			fixedFileCmd = "sudo docker cp "+ fixedFilesAbsolute.Item(i) + " Hydrogen_Env:/home/Hydrogen/MVICFG/TestPrograms/Correct/"+"Prog.c";
 			std::cout << "fixed["<<i<<"]:" << fixedFileCmd.c_str() << std::endl;
 			doExecute(fixedFileCmd);
 	}
@@ -355,9 +358,17 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 	if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
 		wxString CurrentDocPath = OpenDialog->GetPath();
-		system("xdot " + CurrentDocPath);
+		system("xdot " + CurrentDocPath + " &");
 		clearTextBox(log);
-		parse_dot_file(std::string(CurrentDocPath.mbc_str()));
+		parse_dot_file(std::string(CurrentDocPath.mbc_str()));	
+		if(buggyFilesAbsolute.GetCount()> 0 && fixedFilesAbsolute.GetCount() > 0)
+		{
+		// wxString d = "diff " + buggyFilesAbsolute.Item(0) + " " + fixedFilesAbsolute.Item(0) + " > " + buggyFileNames.Item(0)+"-"+fixedFileNames.Item(0)+".txt".c_str();
+		// std::cout<<d + "\n";
+		// wxArrayString diff = doExecute(d);
+		}
+		
+		
 	}
 
 	OpenDialog->Destroy();
