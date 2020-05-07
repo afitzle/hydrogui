@@ -125,6 +125,7 @@ void MainWindow::generateGraph()
  */
 void MainWindow::OnExec(wxCommandEvent& event)
 {
+	//ok
 	generateGraph();
 	if(buggyFileNames.GetCount() > 0 && fixedFileNames.size() > 0)
 	{
