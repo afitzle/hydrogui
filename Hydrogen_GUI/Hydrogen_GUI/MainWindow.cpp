@@ -46,17 +46,11 @@ MainWindow::MainWindow(wxWindow *parent,
 
 	log = new wxTextCtrl(panel, wxID_OK,"", wxPoint(LEFT,75), wxSize(340,200),wxTE_MULTILINE|wxTE_READONLY);
 
-	//parse_dot_file("mydot.dot");
-	//clearTextBox(log);
-
-	// wxButton* showFiles = new wxButton(panel, 7, "List files", wxPoint(RIGHT,150),wxSize(150, 50));
 	
+	//init buttons/triggers
 	Bind(wxEVT_BUTTON, &MainWindow::selectSource, this, 5);
 	Bind(wxEVT_BUTTON, &MainWindow::selectFixed, this, 6);
 	Bind(wxEVT_MENU, &MainWindow::SelectMVICFG, this, 9);
-	// Bind(wxEVT_BUTTON, &MainWindow::ListBuggyAndFixedFiles, this, 7);
-	// wxButton* btn = new wxButton(panel, wxID_ANY, "Button", wxPoint(250,100),wxSize(100, 50));
-	
 	Bind(wxEVT_MENU, &MainWindow::OnAbout, this, 1);
 	Bind(wxEVT_MENU, &MainWindow::OnExec, this, 2);
 	Bind(wxEVT_MENU,&MainWindow::OnClean, this, 8);
@@ -85,9 +79,7 @@ void MainWindow::checkDockerInit()
 
 void MainWindow::generateGraph()
 {
-	//buildninja dir /home/Hydrogen/MVICFG/BuildNinja
 
-	//cd TestPrograms/Buggy
 	wxString prog1;
 	wxString prog2;
 	wxString pathToHydro="/home/Hydrogen/MVICFG/BuildNinja/Hydrogen.out ";
@@ -96,7 +88,7 @@ void MainWindow::generateGraph()
 	wxString pathToProg1=" /home/Hydrogen/MVICFG/TestPrograms/Buggy/";
 	wxString pathToProg2=" /home/Hydrogen/MVICFG/TestPrograms/Correct/";
 	wxString dropScript = "docker cp hydro-clang.sh Hydrogen_Env:/home/Hydrogen/MVICFG/hydro-clang.sh";
-	wxString pickupDot = "docker cp Hydrogen_Env:home/Hydrogen/MVICFG/BuildNinja/MVICFG.dot mydot.dot";
+	
 
 	wxArrayString dumpScript = doExecute(dropScript);
 	std::cout<<"\n" + pathToScript + "\n";
@@ -114,9 +106,15 @@ void MainWindow::generateGraph()
    	 	m_simplePopup->Show();
 		return;	
 	}
+	else
+	{
+		/* code */
+	
+	wxString pickupDot = "docker cp Hydrogen_Env:home/Hydrogen/MVICFG/BuildNinja/MVICFG.dot v1"+buggyFileNames.Item(0)+"-v2"+fixedFileNames.Item(0)+".dot";
 	wxArrayString hydroOut=doExecute(pathToScript);
 
 	wxArrayString snagDot=doExecute(pickupDot);
+	}
 }
 
 /**
@@ -128,7 +126,11 @@ void MainWindow::generateGraph()
 void MainWindow::OnExec(wxCommandEvent& event)
 {
 	generateGraph();
-	parse_dot_file("mydot.dot");
+	if(buggyFileNames.GetCount() > 0 && fixedFileNames.size() > 0)
+	{
+	wxString s = "v1"+buggyFileNames.Item(0)+"-v2"+fixedFileNames.Item(0)+".dot";
+	parse_dot_file(s.ToStdString());
+	}
 }
 /**
  * doExecute
@@ -189,6 +191,11 @@ void MainWindow::OnClean(wxCommandEvent& (event))
 		doExecute(cleanCorrect.Clone().append(deletedCorrect.Item(j)));
 	}
 	std::cout<<"------Cleaned-------"<<std::endl;
+	buggyFileNames.clear();
+	buggyFilesAbsolute.clear();
+	fixedFileNames.clear();
+	fixedFilesAbsolute.clear();
+
 
 }
 
@@ -309,7 +316,6 @@ void MainWindow::TransferBuggyAndFixedFiles()
 	}
 
 	for(i=0; i < countFixed ; i++){
-			// std::cout << "fixed["<<i<<"]:" << fixedFiles.Item(i) << std::endl;
 			fixedFileCmd = "sudo docker cp "+ fixedFilesAbsolute.Item(i) + " Hydrogen_Env:/home/Hydrogen/MVICFG/TestPrograms/Correct/"+fixedFileNames.Item(i);
 			std::cout << "fixed["<<i<<"]:" << fixedFileCmd.c_str() << std::endl;
 			doExecute(fixedFileCmd);
@@ -348,9 +354,6 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 	if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
 		wxString CurrentDocPath = OpenDialog->GetPath();
-		// OpenDialog->GetPaths(buggyFilesAbsolute);
-		// OpenDialog->GetFilenames(buggyFileNames);
-		// Sets our current document to the file the user selected
 		system("xdot " + CurrentDocPath);
 		clearTextBox(log);
 		parse_dot_file(std::string(CurrentDocPath.mbc_str()));
