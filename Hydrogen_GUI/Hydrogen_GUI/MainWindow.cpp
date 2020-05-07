@@ -352,6 +352,8 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 		// OpenDialog->GetFilenames(buggyFileNames);
 		// Sets our current document to the file the user selected
 		system("xdot " + CurrentDocPath);
+		clearTextBox(log);
+		parse_dot_file(std::string(CurrentDocPath.mbc_str()));
 	}
 
 	OpenDialog->Destroy();
@@ -359,11 +361,10 @@ void MainWindow::SelectMVICFG(wxCommandEvent& WXUNUSED(event))
 
 void MainWindow::parse_dot_file(std::string filename) {
 
-	count_t count;
-	count.num_edges = 0;
-	count.num_nodes = 0;
-	count.paths_added = 0;
-	count.paths_removed = 0;
+	unsigned num_edges = 0;
+	unsigned num_nodes = 0;
+	unsigned paths_added = 0;
+	unsigned paths_removed = 0;
 	std::string line;
 	std::ifstream file(filename);
 	std::regex node_regex("\"[0-9]+\" \\[label=");
@@ -374,24 +375,24 @@ void MainWindow::parse_dot_file(std::string filename) {
 
 		while (std::getline(file, line)) {
 			if (std::regex_search(line, node_regex)) {
-				count.num_nodes += 1;
+				num_nodes += 1;
 			}
 			if (std::regex_search(line, edge_regex)) {
-				count.num_edges += 1;
+				num_edges += 1;
 			}
 			if (std::regex_search(line, path_add_regex)) {
-				count.paths_added += 1;
+				paths_added += 1;
 			}
 			if (std::regex_search(line, path_sub_regex)) {
-				count.paths_removed += 1;
+				paths_removed += 1;
 			}
 		}
 	}
         clearTextBox(log);
-	addTextToTextBox(log, "Number of Nodes: " + std::to_string(count.num_nodes));
-	addTextToTextBox(log, "\nNumber of Edges: " + std::to_string(count.num_edges));
-	addTextToTextBox(log, "\nPaths added: " + std::to_string(count.paths_added));
-	addTextToTextBox(log, "\nPaths removed: " + std::to_string(count.paths_removed)+ "\n");
+	addTextToTextBox(log, "Number of Nodes: " + std::to_string(num_nodes));
+	addTextToTextBox(log, "\nNumber of Edges: " + std::to_string(num_edges));
+	addTextToTextBox(log, "\nPaths added: " + std::to_string(paths_added/2));
+	addTextToTextBox(log, "\nPaths removed: " + std::to_string(paths_removed/2)+ "\n");
 }
 
 void MainWindow::addTextToTextBox(wxTextCtrl *textBox, std::string str) {

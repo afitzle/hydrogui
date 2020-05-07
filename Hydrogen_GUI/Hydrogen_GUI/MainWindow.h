@@ -5,13 +5,6 @@
 	#include <wx/wx.h>
 #endif
 
-typedef struct Count {
-	unsigned num_edges;
-	unsigned num_nodes;
-	unsigned paths_added;
-	unsigned paths_removed;
-}count_t;
-
 class MainWindow : public wxFrame
 {
 public:
